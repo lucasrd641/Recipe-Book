@@ -6,9 +6,9 @@ import { Component, Input, Output } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'first-project';
-  viewName = '';
+  viewName = 'recipes';
 
+  // tslint:disable-next-line: typedef
   onChangeViewFired(viewName: string){
     this.viewName = viewName;
   }

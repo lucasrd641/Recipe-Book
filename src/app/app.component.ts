@@ -1,4 +1,5 @@
 import { Component, Input, Output } from '@angular/core';
+import { ShoppingListService } from './shopping-list/shopping-list.service';
 
 @Component({
   selector: 'app-root',
@@ -8,8 +9,8 @@ import { Component, Input, Output } from '@angular/core';
 export class AppComponent {
   viewName = 'recipes';
 
-  // tslint:disable-next-line: typedef
-  onChangeViewFired(viewName: string) {
+  constructor(private shoppingListService: ShoppingListService) {}
+  onChangeViewFired(viewName: string): void {
     this.viewName = viewName;
   }
 }

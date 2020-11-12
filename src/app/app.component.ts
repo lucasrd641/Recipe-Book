@@ -6,11 +6,4 @@ import { ShoppingListService } from './shopping-list/shopping-list.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
-  viewName = 'recipes';
-
-  constructor(private shoppingListService: ShoppingListService) {}
-  onChangeViewFired(viewName: string): void {
-    this.viewName = viewName;
-  }
-}
+export class AppComponent {}

@@ -23,6 +23,11 @@ const appRoutes: Routes = [
         (module) => module.ShoppingListModule
       ),
   },
+  {
+    path: 'auth',
+    loadChildren: () =>
+      import('./auth/auth.module').then((module) => module.AuthModule),
+  },
 ];
 
 @NgModule({

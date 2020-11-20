@@ -26,18 +26,18 @@ import { PlaceHolderDirective } from './shared/placeholder/placeholder.directive
 import { RecipesModule } from './recipes/recipes.module';
 import { ShoppingListModule } from './shopping-list/shopping-list.module';
 import { SharedModule } from './shared/shared.module';
+import { AuthModule } from './auth/auth.module';
 
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, AuthComponent],
+  declarations: [AppComponent, HeaderComponent],
   imports: [
-    FormsModule,
     BrowserModule,
     AppRoutingModule,
-    ReactiveFormsModule,
     HttpClientModule,
     ShoppingListModule,
     RecipesModule,
     SharedModule,
+    AuthModule,
   ],
   providers: [
     ShoppingListService,

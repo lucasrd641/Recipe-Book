@@ -1,5 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Route } from '@angular/compiler/src/core';
 import {
   Component,
   ComponentFactoryResolver,
@@ -8,12 +6,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+import * as AuthActions from '../auth/store/auth.actions';
 import { AlertComponent } from '../shared/alert/alert.component';
-import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 import { PlaceHolderDirective } from '../shared/placeholder/placeholder.directive';
-import { AuthResponseData, AuthService } from './auth.service';
+import * as fromApp from '../store/app.reducer';
 
 @Component({
   selector: 'app-auth',
@@ -27,6 +25,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   @ViewChild(PlaceHolderDirective, { static: false })
   alertHost: PlaceHolderDirective;
   private closeSub: Subscription;
+  private storeSub: Subscription;
 
   authForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -36,17 +35,27 @@ export class AuthComponent implements OnInit, OnDestroy {
     ]),
   });
   constructor(
-    private auth: AuthService,
-    private router: Router,
-    private componentFactoryResolver: ComponentFactoryResolver
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private store: Store<fromApp.AppState>
   ) {}
   ngOnDestroy(): void {
     if (this.closeSub) {
       this.closeSub.unsubscribe();
     }
+    if (this.storeSub) {
+      this.storeSub.unsubscribe();
+    }
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.storeSub = this.store.select('auth').subscribe((authState) => {
+      this.isLoading = authState.loading;
+      this.error = authState.authError;
+      if (this.error) {
+        this.showErrorAlert(this.error);
+      }
+    });
+  }
 
   onSwitchMode(): void {
     this.isLoginMode = !this.isLoginMode;
@@ -66,10 +75,9 @@ export class AuthComponent implements OnInit, OnDestroy {
     });
   }
   onHandleError() {
-    this.error = null;
+    this.store.dispatch(new AuthActions.ClearError());
   }
   onSubmit(): void {
-    let authObs: Observable<AuthResponseData>;
     if (this.authForm.invalid) {
       return;
     }
@@ -77,24 +85,12 @@ export class AuthComponent implements OnInit, OnDestroy {
     const email = formValue.email;
     const password = formValue.password;
 
-    this.isLoading = true;
     if (this.isLoginMode) {
-      authObs = this.auth.login(email, password);
+      // authObs = this.auth.login(email, password);
+      this.store.dispatch(new AuthActions.LoginStart({ email, password }));
     } else {
-      authObs = this.auth.signup(email, password);
+      this.store.dispatch(new AuthActions.SignupStart({ email, password }));
     }
-    authObs.subscribe(
-      (response) => {
-        console.log(response);
-        this.isLoading = false;
-        this.router.navigate(['/recipes']);
-      },
-      (errorResponse) => {
-        this.error = errorResponse;
-        this.showErrorAlert(errorResponse);
-        this.isLoading = false;
-      }
-    );
     console.log(this.authForm.value);
     this.authForm.reset();
   }
